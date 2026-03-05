@@ -24,6 +24,33 @@ def grad_b(y_pred, y_true, x):
 def grad_c(y_pred, y_true):
     error = y_pred - y_true
     return 2 * np.mean(error)
+def backpropagation_quadratic(x, y, a, b, c, learning_rate):
+    y_pred = quadratic_regression(a, b, c, x)
+    
+    dL_da = grad_a(y_pred, y, x)
+    dL_db = grad_b(y_pred, y, x)
+    dL_dc = grad_c(y_pred, y)
+    
+    a = a - learning_rate * dL_da
+    b = b - learning_rate * dL_db
+    c = c - learning_rate * dL_dc
+    
+    error_rmse = rmse(y_pred, y)
+    
+    return a, b, c, error_rmse
+
+def gradient_descent_quadratic(x, y, epochs, learning_rate):
+    a = np.random.randn()
+    b = np.random.randn()
+    c = np.random.randn()
+    
+    rmse_history = []
+    
+    for i in range(epochs):
+        a, b, c, error = backpropagation_quadratic(x, y, a, b, c, learning_rate)
+        rmse_history.append(error)
+    
+    return a, b, c, rmse_history
 #Quelle différence d’interprétation entre MSE et RMSE ?
 # les unité de la mse sont au carré et pour la rmse c'est la même unité que les données
 #Pourquoi la RMSE est parfois plus lisible ?
@@ -38,20 +65,38 @@ if __name__ == "__main__":
     house_prices_df["surface"] = (house_prices_df["surface"] - x_mean) / x_std
     house_prices_df["prix"] = (house_prices_df["prix"] - y_mean) / y_std
     
+    x = house_prices_df["surface"].values
+    y = house_prices_df["prix"].values
+    
     print(house_prices_df.head(5))
     print(house_prices_df.dtypes)
     print(house_prices_df.shape)
-    #Questions
-    # Pourquoi la standardisation aide la descente de gradient ?
-    #La standardisation aide la descente de gradient parce qu'elle rend toutes les variables à la même échelle du coup sa converge plus vite 
-
-    #     #Que se passe-t-il si on ne normalise pas et que les surfaces sont en dizaines alors que les prix
-    # sont en centaines de milliers ?
-    #sa vas converger de manière très lente le gradient pour le prix sera énorme 
-
-    plt.scatter(house_prices_df["surface"], house_prices_df["prix"])
+    
+    a, b, c, rmse_history = gradient_descent_quadratic(x, y, epochs=1000, learning_rate=0.01)
+    
+    y_pred = quadratic_regression(a, b, c, x)
+    
+    plt.figure(figsize=(12, 5))
+    
+    plt.subplot(1, 2, 1)
+    plt.scatter(x, y, alpha=0.5)
+    x_sorted = np.sort(x)
+    y_sorted = quadratic_regression(a, b, c, x_sorted)
+    plt.plot(x_sorted, y_sorted, color='red', label='prediction')
     plt.xlabel("surface")
     plt.ylabel("prix")
+    plt.legend()
+    
+    plt.subplot(1, 2, 2)
+    plt.plot(rmse_history)
+    plt.xlabel("epochs")
+    plt.ylabel("RMSE")
+    
+    plt.tight_layout()
+    plt.show()
+    
+    print(f"RMSE final: {rmse_history[-1]}")
+    print(f"Parametres: a={a}, b={b}, c={c}")
     plt.show()
 
     

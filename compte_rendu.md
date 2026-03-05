@@ -1,58 +1,60 @@
 # Compte Rendu - Régression Quadratique
 
-## Objectif
-Prédire les prix des maisons en fonction de leur surface en utilisant un modèle de régression quadratique.
-
 ## 1. Standardisation des Données
-Avant de commencer, on a standardisé (normalisé) les données. Cela signifie :
-- Soustraire la moyenne de chaque valeur
+Avant de commencer, on a standardisé les données :
+- Soustraire la moyenne
 - Diviser par l'écart-type
 
-**Pourquoi ?** Cela aide la descente de gradient à converger plus vite. Sans standardisation, les gradients seraient énormes et instables.
+**Pourquoi ?** Cela aide la descente de gradient à converger plus vite et rend les gradients stables.
 
-## 2. Le Modèle
-On utilise une fonction quadratique pour faire les prédictions :
+## 2. Le Modèle Quadratique
+Fonction de prédiction : $\hat{y} = ax^2 + bx + c$
 
-$$\hat{y} = ax^2 + bx + c$$
+C'est une parabole, plus flexible qu'une droite. Les poids à apprendre sont : $a$, $b$, $c$
 
-C'est une parabole, plus flexible qu'une droite. Elle peut s'adapter à plus de types de données.
+## 3. Dérivation des Gradients
 
-**Les poids du modèle :** $a$, $b$, $c$
-Ce sont les paramètres que le modèle doit apprendre.
+**Fonction de perte :**
+$$L = \frac{1}{n} \sum_{i=1}^{n} (e_i)^2 \text{ où } e_i = \hat{y}_i - y_i$$
 
-## 3. Les Métriques d'Erreur
-On mesure la qualité du modèle avec deux métriques :
-
-**MSE (Mean Squared Error) :**
-$$L = \frac{1}{n} \sum_{i=1}^{n} (e_i)^2$$
-- Calcule la moyenne des erreurs au carré
-- Unités au carré (difficile à interpréter)
-
-**RMSE (Root Mean Squared Error) :**
-$$RMSE = \sqrt{MSE}$$
-- Racine carrée du MSE
-- Unités identiques aux données (facile à interpréter)
-
-## 4. Les Gradients
-Les gradients mesurent comment l'erreur change quand on modifie les poids. Ils indiquent la direction pour améliorer le modèle.
-
+**Dérivées partielles :**
 $$\frac{\partial L}{\partial a} = \frac{2}{n} \sum_{i=1}^{n} e_i x_i^2$$
-
 $$\frac{\partial L}{\partial b} = \frac{2}{n} \sum_{i=1}^{n} e_i x_i$$
-
 $$\frac{\partial L}{\partial c} = \frac{2}{n} \sum_{i=1}^{n} e_i$$
 
-où $e_i = \hat{y}_i - y_i$ est l'erreur.
+Le facteur $\frac{1}{n}$ intervient parce qu'on moyenne sur toutes les données.
 
-## 5. Comment ça Marche ?
-1. On initialise les poids aléatoirement
-2. On calcule les prédictions avec la formule quadratique
-3. On mesure l'erreur avec MSE
-4. On calcule les gradients
-5. On met à jour les poids dans la direction opposée au gradient
-6. On répète jusqu'à convergence
+## 4. Backpropagation
+Calcul des gradients et mise à jour des poids :
+$$a \leftarrow a - \eta \frac{\partial L}{\partial a}$$
+$$b \leftarrow b - \eta \frac{\partial L}{\partial b}$$
+$$c \leftarrow c - \eta \frac{\partial L}{\partial c}$$
 
-Cela s'appelle la **descente de gradient**.
+où $\eta$ est le learning rate.
 
-## Conclusion
-Ce modèle permet de prédire les prix des maisons de manière plus flexible qu'une simple droite. La standardisation et les gradients sont essentiels pour que le modèle apprenne correctement.
+**À quoi sert $\eta$ ?** Il contrôle la taille des pas. Petit $\eta$ = convergence lente, grand $\eta$ = risque de divergence.
+
+## 5. Descente de Gradient
+1. Initialiser $a$, $b$, $c$ aléatoirement
+2. Pour chaque epoch :
+   - Calculer les prédictions
+   - Calculer les gradients
+   - Mettre à jour les poids
+   - Stocker la RMSE
+3. Répéter jusqu'à convergence
+
+**Symptômes d'un learning rate trop grand :**
+- RMSE augmente
+- Les poids explosent
+
+**Symptôme d'un learning rate trop petit :**
+- Convergence très lente
+
+## 6. Résultats
+Le code entraîne le modèle et affiche :
+- Nuage de points + courbe quadratique prédite
+- Évolution de la RMSE à chaque epoch
+- RMSE final et paramètres du modèle
+
+La RMSE devrait décroître globalement, mais peut avoir des petites variations.
+
