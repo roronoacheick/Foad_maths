@@ -2,14 +2,28 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 def quadratic_regression(a, b, c, x):
     return a * x**2 + b * x + c
-# c'est plus flexible qu'un modèle affine car il peut s'adapter  a plusieurs types de données et en plus c'est une parabole 
+
 def mse(y_pred, y_true):
     return np.mean((y_pred - y_true) ** 2)
 
 def rmse(y_pred, y_true):
     return np.sqrt(mse(y_pred, y_true))
+
+def grad_a(y_pred, y_true, x):
+    error = y_pred - y_true
+    return 2 * np.mean(error * x**2)
+
+def grad_b(y_pred, y_true, x):
+    error = y_pred - y_true
+    return 2 * np.mean(error * x)
+
+def grad_c(y_pred, y_true):
+    error = y_pred - y_true
+    return 2 * np.mean(error)
 #Quelle différence d’interprétation entre MSE et RMSE ?
 # les unité de la mse sont au carré et pour la rmse c'est la même unité que les données
 #Pourquoi la RMSE est parfois plus lisible ?
